@@ -9,11 +9,16 @@ public partial class Movement : Resource
         Player = player;
     }
 
-
     public void HandleMovement()
     {
         if (!Player.isClimbing)
         {
+            if (Player.Dash.isDashing)
+            {
+                Player._sprite.Play("dash");
+                return;
+            }
+
             Player.velocity.X = 0;
             if (Input.IsActionPressed("left"))
             {
@@ -25,11 +30,8 @@ public partial class Movement : Resource
                 Player.velocity.X = Player.speed;
                 Player._sprite.Play("move");
             }
-            else
-            {
-                Player.velocity.X = 0;
+            else 
                 Player._sprite.Play("idle");
-            }
         }
     }
 }
