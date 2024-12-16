@@ -4,26 +4,20 @@ using Godot;
 public partial class Dash : Resource
 {
     private Player Player;
-
-    public void SetPlayer(Player player)
-    {
-        Player = player;
-    }
-
+    private PackedScene _abilityPopupScene;
 
     public float dashCooldown = 2f;
     public bool canDash = true;
     public bool isDashing = false;
-    public bool dashUnlocked = false;
     public double currentDashCooldown = 0f;
     public float dashDuration = .2f;
+    public bool dashUnlocked = false;
 
-    public void UnlockDash()
+    public void SetPlayer(Player player)
     {
-        dashUnlocked = true;
-        Player._dashIndicator.Visible = true;
+        Player = player;
+        _abilityPopupScene = GD.Load<PackedScene>("res://Scenes/AbilityPopup.tscn");
     }
-
 
     public void HandleDash()
     {
@@ -50,12 +44,14 @@ public partial class Dash : Resource
             float dashDirection = Player._sprite.FlipH ? -1 : 1;
             Player.velocity.X = Player.dashSpeed * dashDirection;
         }
+
     }
 
     private void StartDash()
     {
         if (!canDash) return;
         
+        Player._sprite.Play("dash");
         isDashing = true;
         canDash = false;
         currentDashCooldown = 0f;
@@ -63,5 +59,22 @@ public partial class Dash : Resource
 
         Player._dashTimer.WaitTime = dashDuration;
         Player._dashTimer.Start();
+    }
+    
+    public void UnlockDash()
+    {
+        dashUnlocked = true;
+        Player._dashIndicator.Visible = true;
+        UnlockMessage();
+    }
+
+    private void UnlockMessage()
+    {
+        var abilityPopup = _abilityPopupScene.Instantiate<AbilityPopup>();
+        Player.AddChild(abilityPopup);
+        abilityPopup.ShowAbilityPopup(
+            "Dashing", 
+            "You can now dash by pushing the [F] key."
+        );
     }
 }
