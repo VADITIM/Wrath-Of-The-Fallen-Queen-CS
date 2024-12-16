@@ -15,13 +15,14 @@ public partial class Player : CharacterBody2D
 
     // SCRIPTS  --------------------------------------------------------------------------------------------------------
     private Movement Movement = new Movement();
-    private Climbing Climbing = new Climbing();
+    public Climbing Climbing = new Climbing();
     private Gravity Gravity = new Gravity();
     private Jump Jump = new Jump();
     public Dash Dash = new Dash();
     private Coin Coin = new Coin();
     private DashUnlocker DashUnlocker = new DashUnlocker();
     // ----------------------------------------------------
+    
 
     [Export] public float speed = 600f;
     [Export] public float jumpForce = -800f;
@@ -30,8 +31,6 @@ public partial class Player : CharacterBody2D
     [Export] public float climbSpeed = 100f;
     [Export] public int health = 3;
     private bool damageTaken = false;
-
-
 
     public Vector2 velocity = Vector2.Zero;
 
@@ -51,6 +50,10 @@ public partial class Player : CharacterBody2D
         _dashTimer = GetNode<Timer>("DashTimer");
         _dashIndicator = GetNode<Sprite2D>("DashIndicator");
         _dashIndicator.Visible = false;
+        if (_wallRaycastLeft == null)
+        {
+            GD.Print("WallRaycastLeft is null");
+        }
         // ----------------------------------------------------
 
         // SCRIPTS  --------------------------------------------------------------------------------------------------------
