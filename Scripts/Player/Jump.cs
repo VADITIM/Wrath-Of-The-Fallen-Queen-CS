@@ -9,7 +9,6 @@ public partial class Jump : Resource
         Player = player;
     }
 
-    
     public void HandleJump()
     {
         if (Player.IsOnFloor())
