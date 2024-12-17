@@ -11,6 +11,8 @@ public partial class Player : CharacterBody2D
     private Timer _iFrames;
     public Timer _dashTimer;
     public Sprite2D _dashIndicator;
+
+    [Export] public PackedScene _ghostDash;
     // ----------------------------------------------------
 
     // SCRIPTS  --------------------------------------------------------------------------------------------------------
@@ -50,10 +52,6 @@ public partial class Player : CharacterBody2D
         _dashTimer = GetNode<Timer>("DashTimer");
         _dashIndicator = GetNode<Sprite2D>("DashIndicator");
         _dashIndicator.Visible = false;
-        if (_wallRaycastLeft == null)
-        {
-            GD.Print("WallRaycastLeft is null");
-        }
         // ----------------------------------------------------
 
         // SCRIPTS  --------------------------------------------------------------------------------------------------------
@@ -73,12 +71,23 @@ public partial class Player : CharacterBody2D
         Gravity.HandleGravity();
         Climbing.HandleClimb();
 
-        Dash.HandleDash();
+        Dash.HandleDash((float)delta);
+        DisplayGhost();
+        
         FlipSprite();
         CheckIfOnFloor();
         CheckForDamage();
 
         MoveAndSlide();
+    }
+
+    private void DisplayGhost()
+    {
+        if (!Dash.isDashing) return;
+        GhostDash ghost = _ghostDash.Instantiate() as GhostDash;
+        Owner.AddChild(ghost);
+        ghost.GlobalPosition = this.GlobalPosition;
+        ghost.FlipSprite(_sprite.FlipH);
     }
 
     public void CollectUnlocker(Node collectedObject)
