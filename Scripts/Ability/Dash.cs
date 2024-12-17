@@ -6,14 +6,14 @@ public partial class Dash : Resource
     private Player Player;
     private PackedScene _abilityPopupScene;
     
-    public float dashCooldown = 2f;
+    public float dashCooldown = 1.6f;
     public bool canDash = true;
     public bool isDashing = false;
     public float currentDashCooldown = 0f;
     public float dashDuration = .2f;
     public bool dashUnlocked = false;
-    public float ghostDashInterval = 0f; // Interval for ghost dash instantiation
-    private float ghostDashElapsedTime = 0f; // Elapsed time for ghost dash
+    public float ghostDashInterval = 0f; 
+    private float ghostDashElapsedTime = 0f; 
 
     public void SetPlayer(Player player)
     {
@@ -56,7 +56,7 @@ public partial class Dash : Resource
         isDashing = true;
         canDash = false;
         currentDashCooldown = 0f;
-        ghostDashElapsedTime = 0f; // Reset elapsed time
+        ghostDashElapsedTime = 0f;
         GD.Print("Dash started");
 
         Player._dashTimer.WaitTime = dashDuration;
