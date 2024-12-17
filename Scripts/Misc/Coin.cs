@@ -3,6 +3,7 @@ using Godot;
 public partial class Coin : Area2D
 {
     public Sprite2D _sprite;
+	private Float Float = new Float();
 
     private float coinCount = 0;
 
@@ -10,18 +11,8 @@ public partial class Coin : Area2D
     {
         _sprite = GetNode<Sprite2D>("Sprite2D");
 
-        Float();
-    }
-
-    private void Float()
-    {
-        Vector2 startPosition = Position;
-        Vector2 endPosition = Position + new Vector2(0, -10); 
-
-        var tween = GetTree().CreateTween();
-        tween.TweenProperty(this, "position", endPosition, 1.0f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-        tween.TweenProperty(this, "position", startPosition, 1.0f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-        tween.SetLoops();
+        Float.SetOwner(this);
+        Float.Floating();
     }
 
     private void OnBodyEntered(Player player)
