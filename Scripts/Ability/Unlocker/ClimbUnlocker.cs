@@ -14,6 +14,7 @@ public partial class ClimbUnlocker : Area2D
 
     private void OnBodyEntered(Player player)
     {
+        Float.StopFloating();
         player.Climbing.UnlockClimb();
         player.CollectUnlocker(this);
     }

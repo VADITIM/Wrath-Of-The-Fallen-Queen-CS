@@ -16,6 +16,7 @@ public partial class DashUnlocker : Area2D
 	{
 		if (player is Player)
 		{
+			Float.StopFloating();
 			player.Dash.UnlockDash();
 			player.CollectUnlocker(this);
 		}

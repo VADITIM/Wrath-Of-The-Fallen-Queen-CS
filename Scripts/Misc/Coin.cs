@@ -25,6 +25,7 @@ public partial class Coin : Area2D
 
     private void CollectCoin()
     {
+        Float.StopFloating();
         QueueFree();
         CoinIncrement();
         GD.Print("Coin collected!");
