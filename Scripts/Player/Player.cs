@@ -11,6 +11,7 @@ public partial class Player : CharacterBody2D
     private Timer _iFrames;
     public Timer _dashTimer;
     public Sprite2D _dashIndicator;
+    private Area2D _hurtbox;
 
     [Export] public PackedScene _ghostDash;
     // ----------------------------------------------------
@@ -51,7 +52,7 @@ public partial class Player : CharacterBody2D
         _iFrames = GetNode<Timer>("IFrames");
         _dashTimer = GetNode<Timer>("DashTimer");
         _dashIndicator = GetNode<Sprite2D>("DashIndicator");
-        _dashIndicator.Visible = false;
+        _hurtbox = GetNode<Area2D>("Hurtbox");
         // ----------------------------------------------------
 
         // SCRIPTS  --------------------------------------------------------------------------------------------------------
@@ -61,6 +62,8 @@ public partial class Player : CharacterBody2D
         Jump.SetPlayer(this);
         Dash.SetPlayer(this);
         // ----------------------------------------------------
+
+        _dashIndicator.Visible = false;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -76,7 +79,7 @@ public partial class Player : CharacterBody2D
         
         FlipSprite();
         CheckIfOnFloor();
-        CheckForDamage();
+        CheckForDamage();   
 
         MoveAndSlide();
     }
@@ -103,6 +106,7 @@ public partial class Player : CharacterBody2D
         }
     }
 
+
     private void ApplyDamage()
     {
         if (damageTaken) return;
@@ -110,17 +114,43 @@ public partial class Player : CharacterBody2D
         health--;
         damageTaken = true;
         _iFrames.Start();
+        
+        // Optional: Add visual feedback
+        _sprite.Modulate = new Color(1, 0.3f, 0.3f, 0.7f); // Red tint
+        
         GD.Print("Player health: " + health);
     }
-    
+
+    private void OnHurtboxAreaEntered(Area2D area)
+    {
+        CheckForDamage();
+    }
+
+    // TRY WITH ISONCEILING
     private void CheckForDamage()
     {
-        Vector2I tilePosition = _damageLayer.LocalToMap(GlobalPosition);
+        if (damageTaken) return;
 
-        int sourceId = _damageLayer.GetCellSourceId(tilePosition);
-        if (sourceId != -1)
+        // Get the current tile position of the player
+        Vector2I currentTilePos = _damageLayer.LocalToMap(GlobalPosition);
+        
+        // Check the tile at player's position and surrounding tiles
+        Vector2I[] checkPositions = new Vector2I[]
         {
-            ApplyDamage();
+            currentTilePos,                    // Current position
+            currentTilePos + new Vector2I(0, 1),  // Below
+            currentTilePos + new Vector2I(0, -1), // Above
+            currentTilePos + new Vector2I(1, 0),  // Right
+            currentTilePos + new Vector2I(-1, 0)  // Left
+        };
+
+        foreach (var pos in checkPositions)
+        {
+            if (_damageLayer.GetCellSourceId(pos) != -1)
+            {
+                ApplyDamage();
+                return;
+            }
         }
     }
 
@@ -138,8 +168,9 @@ public partial class Player : CharacterBody2D
     {
         GD.Print("IFrames ended");
         damageTaken = false;
+        _sprite.Modulate = new Color(1, 1, 1, 1); // Reset color
     }
-
+    
     public void OnDashTimeout()
     {
         Dash.isDashing = false;
