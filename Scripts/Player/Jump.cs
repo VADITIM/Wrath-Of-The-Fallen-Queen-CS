@@ -19,5 +19,10 @@ public partial class Jump : Resource
                 Player.velocity.Y = Player.jumpForce;
             }
         }
+        
+        if (Player.IsOnCeiling())
+        {
+            Player.velocity.Y = 0;
+        }
     }
 }
