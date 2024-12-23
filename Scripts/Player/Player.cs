@@ -11,7 +11,6 @@ public partial class Player : CharacterBody2D
     private Timer _iFrames;
     public Timer _dashTimer;
     public Sprite2D _dashIndicator;
-    private Area2D _hurtbox;
 
     [Export] public PackedScene _ghostDash;
     // ----------------------------------------------------
@@ -52,7 +51,6 @@ public partial class Player : CharacterBody2D
         _iFrames = GetNode<Timer>("IFrames");
         _dashTimer = GetNode<Timer>("DashTimer");
         _dashIndicator = GetNode<Sprite2D>("DashIndicator");
-        _hurtbox = GetNode<Area2D>("Hurtbox");
         // ----------------------------------------------------
 
         // SCRIPTS  --------------------------------------------------------------------------------------------------------
@@ -126,27 +124,29 @@ public partial class Player : CharacterBody2D
         CheckForDamage();
     }
 
-    // TRY WITH ISONCEILING
     private void CheckForDamage()
     {
+        int tileSize = 20;
+        
         if (damageTaken) return;
 
         // Get the current tile position of the player
         Vector2I currentTilePos = _damageLayer.LocalToMap(GlobalPosition);
-        
+        Vector2I playerPos = _damageLayer.LocalToMap(GlobalPosition + new Vector2(0, -tileSize));
+
         // Check the tile at player's position and surrounding tiles
         Vector2I[] checkPositions = new Vector2I[]
         {
-            currentTilePos,                    // Current position
-            currentTilePos + new Vector2I(0, 1),  // Below
-            currentTilePos + new Vector2I(0, -1), // Above
-            currentTilePos + new Vector2I(1, 0),  // Right
-            currentTilePos + new Vector2I(-1, 0)  // Left
+            currentTilePos,      
+            playerPos,
+            playerPos + new Vector2I(0, 1),  // Below
+            playerPos + new Vector2I(0, -1), // Above
         };
 
-        foreach (var pos in checkPositions)
+        foreach (Vector2I pos in checkPositions)
         {
-            if (_damageLayer.GetCellSourceId(pos) != -1)
+            int sourceId = _damageLayer.GetCellSourceId(pos);
+            if (sourceId != -1)
             {
                 ApplyDamage();
                 return;
