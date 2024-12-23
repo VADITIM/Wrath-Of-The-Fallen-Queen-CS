@@ -16,7 +16,7 @@ public partial class Player : CharacterBody2D
     // ----------------------------------------------------
 
     // SCRIPTS  --------------------------------------------------------------------------------------------------------
-    private Movement Movement = new Movement();
+    public Movement Movement = new Movement();
     public Climbing Climbing = new Climbing();
     private Gravity Gravity = new Gravity();
     private Jump Jump = new Jump();
@@ -71,6 +71,7 @@ public partial class Player : CharacterBody2D
 
         Gravity.HandleGravity();
         Climbing.HandleClimb();
+        Climbing.HandleWallJump((float)delta);
 
         Dash.HandleDash((float)delta);
         DisplayGhost();
@@ -104,7 +105,6 @@ public partial class Player : CharacterBody2D
         }
     }
 
-
     private void ApplyDamage()
     {
         if (damageTaken) return;
@@ -117,11 +117,6 @@ public partial class Player : CharacterBody2D
         _sprite.Modulate = new Color(1, 0.3f, 0.3f, 0.7f); // Red tint
         
         GD.Print("Player health: " + health);
-    }
-
-    private void OnHurtboxAreaEntered(Area2D area)
-    {
-        CheckForDamage();
     }
 
     private void CheckForDamage()
