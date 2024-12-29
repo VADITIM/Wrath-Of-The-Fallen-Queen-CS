@@ -17,12 +17,11 @@ public partial class Player : CharacterBody2D
 
     // SCRIPTS  --------------------------------------------------------------------------------------------------------
     public Movement Movement = new Movement();
-    public Climbing Climbing = new Climbing();
-    private Gravity Gravity = new Gravity();
     private Jump Jump = new Jump();
     public Dash Dash = new Dash();
-    private Coin Coin = new Coin();
-    private DashUnlocker DashUnlocker = new DashUnlocker();
+    public Climbing Climbing = new Climbing();
+    public WallJump WallJump = new WallJump();
+    private Gravity Gravity = new Gravity();
     // ----------------------------------------------------
     
 
@@ -44,18 +43,18 @@ public partial class Player : CharacterBody2D
     {
         // NODES    --------------------------------------------------------------------------------------------------------
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-        // var raycastsNode = GetNode<Node>("Raycasts");
-        _wallRaycastLeft = GetNode<RayCast2D>("WallRaycastLeft");
-        _wallRaycastRight = GetNode<RayCast2D>("WallRaycastRight");
-        _damageLayer = GetNode<TileMapLayer>("/root/World/DamageLayer");
-        _iFrames = GetNode<Timer>("IFrames");
-        _dashTimer = GetNode<Timer>("DashTimer");
+        _wallRaycastLeft = GetNode<RayCast2D>("Raycasts/WallRaycastLeft");
+        _wallRaycastRight = GetNode<RayCast2D>("Raycasts/WallRaycastRight");
+        _damageLayer = GetNode<TileMapLayer>("/root/World/Layers/DamageLayer");
+        _iFrames = GetNode<Timer>("Timers/IFrames");
+        _dashTimer = GetNode<Timer>("Timers/DashTimer");
         _dashIndicator = GetNode<Sprite2D>("DashIndicator");
         // ----------------------------------------------------
 
         // SCRIPTS  --------------------------------------------------------------------------------------------------------
         Movement.SetPlayer(this);
         Climbing.SetPlayer(this);
+        WallJump.SetPlayer(this);
         Gravity.SetPlayer(this);
         Jump.SetPlayer(this);
         Dash.SetPlayer(this);
@@ -70,8 +69,8 @@ public partial class Player : CharacterBody2D
         Jump.HandleJump();
 
         Gravity.HandleGravity();
-        Climbing.HandleClimb();
-        Climbing.HandleWallJump((float)delta);
+        Climbing.HandleClimb((float) delta);
+        WallJump.HandleWallJump((float)delta);
 
         Dash.HandleDash((float)delta);
         DisplayGhost();
