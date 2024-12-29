@@ -3,26 +3,20 @@ using Godot;
 public partial class Climbing : Resource
 {
     private Player Player;
+    private WallJump WallJump;
     private PackedScene _abilityPopupScene;
 
     private bool climbUnlocked = false;
-
-    private bool wallJumping = false;
-    private const float WALLJUMPDURATION = 1f;
-    private Vector2 wallJumpStartVelocity;
-    private Vector2 wallJumpTargetVelocity;
-    private float wallJumpTimer;
-    private Vector2 wallJumpStartPosition;
-    private Vector2 wallJumpTargetPosition;
-    private const float WALLJUMPDISTANCE = 100;
+    private float holdTimeout = 2f; 
 
     public void SetPlayer(Player player)
     {
         Player = player;
+        WallJump = player.WallJump;
         _abilityPopupScene = GD.Load<PackedScene>("res://Scenes/AbilityPopup.tscn");
     }
 
-    public void HandleClimb()
+    public void HandleClimb(float delta)
     {
         if (Player.canClimb && climbUnlocked)
         {
@@ -30,8 +24,13 @@ public partial class Climbing : Resource
             {
                 Player.isClimbing = true;
                 Player.velocity = new Vector2(0, 0);
+                holdTimeout -= delta;
                 // Player._sprite.Play("climb");
-
+                if (holdTimeout <= 0)
+                {
+                    Player.canClimb = false;
+                    holdTimeout = 2f;
+                }
                 if (Input.IsActionPressed("up"))
                 {
                     Player.velocity.Y = -Player.climbSpeed;
@@ -40,12 +39,11 @@ public partial class Climbing : Resource
                 {
                     Player.velocity.Y = Player.climbSpeed;
                 }
-                else if (Input.IsActionPressed("jump"))
+                else if (Input.IsActionJustPressed("jump"))
                 {
-                    WallJump();
+                    WallJump.WallJumping();
+                    holdTimeout = 2f;
                 }
-                else
-                    Player.velocity.Y = 0;
             }
             else
                 Player.isClimbing = false;
@@ -57,41 +55,9 @@ public partial class Climbing : Resource
     public void UnlockClimb()
     {
         climbUnlocked = true;
-        // UnlockMessage();
+        UnlockMessage();
     }
 
-    public void WallJump()
-    {
-        Player.isClimbing = false;
-        wallJumping = true;
-        wallJumpTimer = 0f;
-
-        float jumpDirection = Player._sprite.FlipH ? -1 : 1;
-        
-        // Store start position and calculate target position
-        wallJumpStartPosition = Player.Position;
-        wallJumpTargetPosition = wallJumpStartPosition + new Vector2(
-            jumpDirection * WALLJUMPDISTANCE,  // Horizontal distance
-            -WALLJUMPDISTANCE                  // Vertical distance (negative for upward)
-        );
-    }
-    public void HandleWallJump(float delta)
-    {
-        if (!wallJumping) return;
-
-        wallJumpTimer += delta;
-        float timer = wallJumpTimer / WALLJUMPDURATION;
-
-        if (timer >= .3f)
-        {
-            wallJumping = false;
-            return;
-        }
-
-        float easeOut = 1 - Mathf.Pow(1 - timer, 3);
-        Player.velocity = wallJumpStartVelocity.Lerp(wallJumpTargetVelocity, easeOut);
-        Player.Position = wallJumpStartPosition.Lerp(wallJumpTargetPosition, easeOut);
-    }
     private void UnlockMessage()
     {
         var abilityPopup = _abilityPopupScene.Instantiate<AbilityPopup>();
